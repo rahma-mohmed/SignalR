@@ -1,0 +1,92 @@
+﻿@model List<RealTimeTable.Models.Employee>
+
+@{
+    ViewData["Title"] = "Employees";
+}
+
+<h2>Employees</h2>
+
+<div class="container mt-4">
+    <div class="row d-flex align-items-start">
+        <!-- Employee Table -->
+        <div class="col-md-7">
+            <table class="table table-striped table-bordered" id="employeeTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Age</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var employee in Model)
+                    {
+                        <tr>
+                            <td>@employee.Name</td>
+                            <td>@employee.Position</td>
+                            <td>@employee.Age</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Employee Form -->
+        <div class="col-md-5">
+            <h4 class="text-primary">Add Employee</h4>
+            <div class="card shadow p-4">
+                <form>
+                    <div class="form-group">
+                        <label for="Name">Name</label>
+                        <input type="text" id="Name" class="form-control" placeholder="Enter Name" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <label for="Position">Position</label>
+                        <input type="text" id="Position" class="form-control" placeholder="Enter Position" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <label for="Age">Age</label>
+                        <input type="number" id="Age" class="form-control" placeholder="Enter Age" />
+                    </div>
+                    <button type="button" class="btn btn-primary mt-3 w-100" onclick="Add()">Add Employee</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
+
+    <script>
+        var connection = new signalR.HubConnectionBuilder().withUrl("/employeeHub").build();
+    
+        // start connection
+        connection.start();
+
+        // call back function
+         connection.on("newEmployee", function (employee) {
+         console.log("Received newEmployee event:", employee);
+
+            var row = `<tr>
+                <td>${employee.name}</td>
+                <td>${employee.position}</td>
+                <td>${employee.age}</td>
+            </tr>`;
+            document.querySelector("#employeeTable tbody").innerHTML += row;
+        });
+
+
+        // send message
+        function Add() {
+            var AddedEmployee = {
+                Name: document.getElementById("Name").value,
+                Position: document.getElementById("Position").value,
+                Age: parseInt(document.getElementById("Age").value)
+            };
+            connection.invoke("AddEmployee" , AddedEmployee);
+        }
+    </script>
+}
