@@ -22,7 +22,7 @@
 
         // start connection negotionate between client and server to choose the suitable technique (web socket, server send event, long polling)
         connection.start();
-        alert("Connected");
+        //alert("Connected");
 
         // call back function
         connection.on("newMessage", function (name , message) {
@@ -30,14 +30,14 @@
             // li.textContent = message;
             // document.querySelector("ul").appendChild(li);
             $("#ul").append(`<li>${name} : ${message}</li>`);
-            alert("message broadcast from server");
+            //alert("message broadcast from server");
         });
 
         // fuction to call service
         function send() {
             var message = document.getElementById("message").value;
             connection.invoke("SendMessage", nam , message);
-            alert("message sent to service");
+            //alert("message sent to service");
         }
     </script>
 }
