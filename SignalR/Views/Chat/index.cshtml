@@ -1,15 +1,28 @@
 ﻿@{
-    ViewData["Title"] = "index";
+    ViewData["Title"] = "Chat";
 }
 
-<h1>Chat</h1>
-<input type="text" id="message" />
-<input type="button" value="send" id="sendmessage" onclick="send()"/>
-</<br />
+<div class="container mt-4">
+    <h1 class="mb-3 text-primary">Chat</h1>
 
-<ul id="ul">
-    <li></li>
-</ul>
+    <div class="card p-3 shadow-lg">
+        <div class="mb-3 d-flex">
+            <input type="text" id="message" class="form-control me-2" placeholder="Type your message..." />
+            <input type="button" class="btn btn-primary" id="sendmessage" value="Send" onclick="send()" />
+        </div>
+
+        <div class="mb-3 d-flex">
+            <input type="text" id="gtxt" class="form-control me-2" placeholder="Enter group name..." />
+            <input type="button" class="btn btn-success m-2" id="jn" value="Join" onclick="join()"/>
+            <input type="button" class="btn btn-danger m-2" id="lv" value="leave" onclick="leave()"/>
+        </div>
+
+        <input type="button" class="btn btn-warning w-100" value="Send to Group" id="stg" onclick="sendtogroup()" />
+    </div>
+
+    <ul id="ul" class="list-group mt-3">
+    </ul>
+</div>
 
 @section Scripts {
     <script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
@@ -29,15 +42,45 @@
             // var li = document.createElement("li");
             // li.textContent = message;
             // document.querySelector("ul").appendChild(li);
-            $("#ul").append(`<li>${name} : ${message}</li>`);
+            $("#ul").append(`<li class="list-group-item">${name} : ${message}</li>`);
             //alert("message broadcast from server");
         });
 
+        connection.on("newmember", function (name, groupname) {
+            $("#ul").append(`<li class="list-group-item"><i>${name} has joined to group ${groupname}</i></li>`);
+        });
+
+        connection.on("member", function (name, groupname) {
+            $("#ul").append(`<li class="list-group-item"><i>Welcome ${name}, to the ${groupname} group</i></li>`);
+        });
+
+        connection.on("leavemember", function (name, groupname) {
+            $("#ul").append(`<li class="list-group-item"><i>${name} has left from group ${groupname}</i></li>`);
+        });
+
+        connection.on("newgroupmessage", function (name, groupname, message) {
+            $("#ul").append(`<li class="list-group-item">${name} : ${message} (Group: ${groupname})</li>`);
+        });
+        
+        
         // fuction to call service
         function send() {
             var message = document.getElementById("message").value;
             connection.invoke("SendMessage", nam , message);
             //alert("message sent to service");
         }
+
+        function join(){
+            connection.invoke("joingroup", document.getElementById("gtxt").value, nam);
+        }
+
+        function leave(){
+            connection.invoke("leavegroup", document.getElementById("gtxt").value, nam);
+        }
+
+        function sendtogroup(){
+            connection.invoke("sendtogroup", document.getElementById("gtxt").value, nam, document.getElementById("message").value);
+        }
+
     </script>
 }
