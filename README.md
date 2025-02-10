@@ -30,7 +30,7 @@ This repository demonstrates the use of **SignalR** in a **.NET** application fo
    
 2. Navigate to the project:
 ```bash
-  cd your-repo-name
+  cd SignalR
 ```
 
 3. Restore dependencies:
